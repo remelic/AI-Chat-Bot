@@ -9,6 +9,14 @@ const net = new brain.recurrent.LSTM({ // create a new ann
 	activation: 'leaky-relu' // using this activation because.
 });
 
+// dont forget to run 'C:\<Project Folder>\> npm i readline' from the command prompt
+// to add it to the project.
+const readline = require('readline'); // allows console to read user inputs
+const rl = readline.createInterface({ // setups the input format
+  input: process.stdin,
+  output: process.stdout
+});
+
 var trainingData = []; // hold our training data
 
 
@@ -29,6 +37,11 @@ function loadInitialTraining()
 \******************************************/
 function loadTraining()
 {
+	// With the new update, if your program fails to run while using this function
+	// if because the training error was too large and cannot create a net from it.
+	// from what I understand, you wont be able to retrain the net with too high of an error. (0.4+)
+	// what I've done is simply train the net as much as possible and not worry about retraining
+	// in most cases it wont help unless you provide more training data.
 	net.fromJSON(JSON.parse(fs.readFileSync('neuralnet.json', 'utf8')));
 	train(JSON.parse(fs.readFileSync('conversation-data.json')));
 }
@@ -87,16 +100,6 @@ const train = (dt) => {
 }
 
 
-/******************************************\
-| Program Entry Point                      |
-\******************************************/
-const init = () =>
-{
-	loadInitialTraining();
-	//loadTraining();
-	//testTrainingModel();
-}
-init();
 
 
 /******************************************\
@@ -106,6 +109,8 @@ init();
 | as a Topic ID and a reply is generated.  |
 \******************************************/
 const boot = () => {
+	// This was broken in the previous version but should work now
+	// once you include the readline module.
 	rl.question("Enter: ", (q)=>{
 		var qs = q.replace(/[^a-zA-Z ]+/g, "").toLowerCase();
 		console.log(reply(net.run(qs)));
@@ -226,3 +231,16 @@ const greeting = () => {
     }
     return str;
 }
+
+// Move to the bottom becaue it was supposed to be here to begin with.
+// Now you can actually run the test function.
+/******************************************\
+| Program Entry Point                      |
+\******************************************/
+const init = () =>
+{
+	loadInitialTraining();
+	//loadTraining();
+	//testTrainingModel();
+}
+init();
